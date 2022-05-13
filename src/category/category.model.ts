@@ -20,6 +20,6 @@ export class Category extends Model {
   @Column
   name: string;
 
-  @HasMany(() => Product)
+  @HasMany(() => Product, 'category')
   products: Product[];
 }
