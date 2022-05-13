@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   ForeignKey,
   Model,
@@ -26,4 +27,7 @@ export class Product extends Model {
   @Column
   @ForeignKey(() => Category)
   category: number;
+
+  @BelongsTo(() => Category)
+  productCategory: Category;
 }
