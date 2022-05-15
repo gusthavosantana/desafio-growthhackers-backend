@@ -28,6 +28,11 @@ export class CategoryController {
     return this.categoryService.findById(+id);
   }
 
+  @Get(':id/products')
+  getProducts(@Param('id') id: string) {
+    return this.categoryService.getProducts(+id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() data) {
     return this.categoryService.update(+id, data);
@@ -35,6 +40,11 @@ export class CategoryController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+    try {
+      return this.categoryService.remove(+id);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }

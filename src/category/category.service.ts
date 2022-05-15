@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import CategoryHasProductsError from 'src/errors/CategoryHasProductsError';
+import { Product } from 'src/product/product.model';
 import { Category } from './category.model';
 
 @Injectable()
@@ -14,11 +16,20 @@ export class CategoryService {
   }
 
   findAll() {
-    return this.model.findAll();
+    return this.model.findAll({ order: [['id', 'ASC']] });
   }
 
   findById(id: number) {
     return this.model.findByPk(id);
+  }
+
+  async getProducts(id: number) {
+    const data = await this.model.findOne({
+      where: { id },
+      include: Product,
+    });
+
+    return data;
   }
 
   async update(id: number, data) {
@@ -29,7 +40,12 @@ export class CategoryService {
     return await category.save();
   }
 
-  remove(id: number) {
-    return this.model.destroy({ where: { id } });
+  async remove(id: number) {
+    const category = await this.model.findByPk(id, { include: Product });
+
+    if (category.products && category.products.length > 0) {
+      throw new CategoryHasProductsError();
+    }
+    this.model.destroy({ where: { id } });
   }
 }
