@@ -25,7 +25,9 @@ export class ProductService {
   }
 
   async update(id: number, data) {
-    return await this.model.update(data, { where: { id } });
+    await this.model.update(data, { where: { id } });
+
+    return data;
   }
 
   remove(id: number) {
@@ -36,8 +38,14 @@ export class ProductService {
     const content = data.buffer.toString();
     const items = JSON.parse(content) || [];
 
-    await items.map(async (current) =>
-      this.model.create({ ...current, category }),
+    await Promise.all(
+      items.map(async ({ name, price }) =>
+        this.model.create({
+          name,
+          price,
+          category,
+        }),
+      ),
     );
 
     return 'arquivo importado com sucesso.';
